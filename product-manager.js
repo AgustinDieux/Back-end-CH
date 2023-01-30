@@ -22,6 +22,24 @@ class ProductManager {
     }
     return product;
   }
+
+  updateProduct(id, product) {
+    const productIndex = this.products.findIndex((p) => p.id === id);
+    if (productIndex === -1) {
+      throw new Error("Product not found");
+    }
+    const productToUpdate = { ...this.products[productIndex], ...product };
+    productToUpdate.id = id;
+    this.products[productIndex] = productToUpdate;
+  }
+
+  deleteProduct(id) {
+    const productIndex = this.products.findIndex((p) => p.id === id);
+    if (productIndex === -1) {
+      throw new Error("Product not found");
+    }
+    this.products.splice(productIndex, 1);
+  }
 }
 
 const productManager = new ProductManager();
@@ -37,11 +55,11 @@ productManager.addProduct({
 });
 console.log(productManager.getProducts());
 
-productManager.addProduct({
-  title: "producto prueba",
-  description: "Este es un producto prueba",
-  price: 200,
-  thumbnail: "Sin imagen",
-  code: "abc123",
-  stock: 25,
-});
+const productId = productManager.getProducts()[0].id;
+console.log(productManager.getProductById(productId));
+
+productManager.updateProduct(productId, { title: "Nuevo título" });
+console.log(productManager.getProducts());
+
+productManager.deleteProduct(productId);
+console.log(productManager.getProducts());
