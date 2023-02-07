@@ -1,65 +1,68 @@
+const express = require("express");
+const app = express();
+const fs = require("fs");
+
+class Product {
+  constructor(id, name, price, description) {
+    this.id = id;
+    this.name = name;
+    this.price = price;
+    this.description = description;
+  }
+}
+
 class ProductManager {
   constructor() {
     this.products = [];
   }
 
-  getProducts() {
-    return [...this.products];
+  loadProducts() {
+    try {
+      const productsJson = fs.readFileSync("products.json");
+      this.products = JSON.parse(productsJson);
+    } catch (error) {
+      console.error("Error reading products from file:", error);
+    }
   }
 
-  addProduct(product) {
-    if (this.products.some((p) => p.code === product.code)) {
-      throw new Error("Product code already exists");
-    }
-    product.id = Date.now();
-    this.products.push(product);
+  getProducts(limit = this.products.length) {
+    return this.products.slice(0, limit);
   }
 
   getProductById(id) {
-    const product = this.products.find((p) => p.id === id);
+    const product = this.products.find((product) => product.id == id);
     if (!product) {
-      throw new Error("Product not found");
+      throw new Error(`Product with id "${id}" not found.`);
     }
     return product;
-  }
-
-  updateProduct(id, product) {
-    const productIndex = this.products.findIndex((p) => p.id === id);
-    if (productIndex === -1) {
-      throw new Error("Product not found");
-    }
-    const productToUpdate = { ...this.products[productIndex], ...product };
-    productToUpdate.id = id;
-    this.products[productIndex] = productToUpdate;
-  }
-
-  deleteProduct(id) {
-    const productIndex = this.products.findIndex((p) => p.id === id);
-    if (productIndex === -1) {
-      throw new Error("Product not found");
-    }
-    this.products.splice(productIndex, 1);
   }
 }
 
 const productManager = new ProductManager();
-console.log(productManager.getProducts()); // []
+productManager.loadProducts();
 
-productManager.addProduct({
-  title: "producto prueba",
-  description: "Este es un producto prueba",
-  price: 200,
-  thumbnail: "Sin imagen",
-  code: "abc123",
-  stock: 25,
+app.get("/products", (req, res) => {
+  const limit = req.query.limit;
+  const products = productManager.getProducts(limit);
+  res.json(products);
 });
-console.log(productManager.getProducts());
 
-const productId = productManager.getProducts()[0].id;
-console.log(productManager.getProductById(productId));
+app.get("/products/:id", (req, res) => {
+  const id = req.params.id;
+  try {
+    const product = productManager.getProductById(id);
+    console.log(product);
+    res.json(product);
+  } catch (error) {
+    res.status(404).json({ error: error.message });
+  }
+});
 
-productManager.updateProduct(productId, { title: "Nuevo título" });
-console.log(productManager.getProducts());
+app.use((error, req, res, next) => {
+  res.status(500).json({ error: error.message });
+});
 
-productManager.deleteProduct(productId);
-console.log(productManager.getProducts());
+const port = 8080;
+app.listen(port, () => {
+  console.log(`Servidor corriendo en http://localhost:${port}`);
+});

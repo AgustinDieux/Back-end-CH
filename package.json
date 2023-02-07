@@ -1,0 +1,27 @@
+{
+  "name": "back-end",
+  "version": "1.0.0",
+  "description": "Proyecto para el curso de Backend en NodeJS.",
+  "main": "product-manager.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AgustinDieux/Back-end-CH.git"
+  },
+  "keywords": [
+    "backend",
+    "nodejs"
+  ],
+  "author": "Agustin Dieux",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AgustinDieux/Back-end-CH/issues"
+  },
+  "homepage": "https://github.com/AgustinDieux/Back-end-CH#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "moment": "^2.29.4"
+  }
+}

@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "name": "iPhone X",
+    "price": 1000,
+    "description": "Un teléfono inteligente de alta gama de Apple"
+  },
+  {
+    "id": 2,
+    "name": "Samsung Galaxy S21",
+    "price": 900,
+    "description": "Un teléfono inteligente de alta gama de Samsung"
+  },
+  {
+    "id": 3,
+    "name": "Google Pixel 6",
+    "price": 800,
+    "description": "Un teléfono inteligente de alta gama de Google"
+  },
+  {
+    "id": 4,
+    "name": "iPad Pro",
+    "price": 700,
+    "description": "Una tablet de alta gama de Apple"
+  },
+  {
+    "id": 5,
+    "name": "Samsung Galaxy Tab S7",
+    "price": 600,
+    "description": "Una tablet de alta gama de Samsung"
+  },
+  {
+    "id": 6,
+    "name": "Microsoft Surface Pro X",
+    "price": 500,
+    "description": "Una tablet de alta gama de Microsoft"
+  },
+  {
+    "id": 7,
+    "name": "MacBook Air",
+    "price": 1000,
+    "description": "Un portátil de alta gama de Apple"
+  },
+  {
+    "id": 8,
+    "name": "Dell XPS 13",
+    "price": 900,
+    "description": "Un portátil de alta gama de Dell"
+  },
+  {
+    "id": 9,
+    "name": "Lenovo ThinkPad X1 Carbon",
+    "price": 800,
+    "description": "Un portátil de alta gama de Lenovo"
+  },
+  {
+    "id": 10,
+    "name": "Laptop Dell Inspiron",
+    "price": 1200,
+    "description": "Laptop con pantalla de 15.6 pulgadas, procesador Intel i7, 8GB de RAM y almacenamiento de 256"
+  }
+]
