@@ -1,7 +1,35 @@
 const express = require("express");
+const exphbs = require("express-handlebars");
 const app = express();
 const fs = require("fs");
-const port = 8080;
+const port = 9092;
+const http = require("http").Server(app);
+const io = require("socket.io")(http);
+
+io.on("connection", (socket) => {
+  console.log("Usuario conectado");
+
+  socket.on("addProduct", (product) => {
+    // Agregar el producto a la lista
+    products.push(product);
+
+    // Emitir el evento de que se ha agregado un producto
+    io.emit("productAdded", product);
+  });
+});
+
+app.engine("handlebars", exphbs.engine());
+app.set("view engine", "handlebars");
+
+// Ruta para la vista de productos en tiempo real
+app.get("/real-time-products", (req, res) => {
+  res.render("realTimeProducts");
+});
+
+// Ruta para la vista de inicio
+app.get("/", (req, res) => {
+  res.render("home");
+});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -125,11 +153,11 @@ function saveCartsToFile() {
 }
 
 // Cargar la información de los carritos desde el archivo "carts.json" al iniciar el servidor
-try {
-  carts = JSON.parse(fs.readFileSync("carts.json"));
-} catch (err) {
-  console.error("No se pudo cargar la información de los carritos", err);
-}
+//try {
+//  JSON.parse(fs.readFileSync("carts.json"));
+//} catch (err) {
+//  console.error("No se pudo cargar la información de los carritos", err);
+//}
 
 // Guardar la información de los carritos en el archivo "carts.json" al finalizar el servidor
 process.on("exit", saveCartsToFile);
