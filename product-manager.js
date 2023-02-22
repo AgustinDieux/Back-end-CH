@@ -2,6 +2,7 @@ const express = require("express");
 const exphbs = require("express-handlebars");
 const app = express();
 const fs = require("fs");
+const path = require("path");
 const port = 9092;
 const http = require("http").Server(app);
 const io = require("socket.io")(http);
@@ -143,7 +144,7 @@ cartRouter.post("/:cid/product/:pid", (req, res) => {
 
 app.use("/api/carts", cartRouter);
 
-app.listen(port, () => {
+http.listen(port, () => {
   console.log(`Servidor corriendo en puerto ${port}`);
 });
 
