@@ -8,7 +8,13 @@
     <h1>Productos en tiempo real</h1>
     <ul id="product-list">
       {{#each products}}
-        <li>{{this.title}}</li>
+        <li>
+          <h3>{{this.title}}</h3>
+          <p>{{this.description}}</p>
+          <p>Precio: ${{this.price}}</p>
+          <p>Stock: {{this.stock}}</p>
+          <p>Categoría: {{this.category}}</p>
+        </li>
       {{/each}}
     </ul>
 
@@ -27,13 +33,17 @@
       const socket = io(); const productList =
       document.querySelector("#product-list"); const productForm =
       document.querySelector("#product-form"); socket.on("productAdded",
-      (product) => { const li = document.createElement("li"); li.textContent =
-      product.title; productList.appendChild(li); });
-      productForm.addEventListener("submit", (event) => { const data = new
-      FormData(productForm); const product = { title: data.get("title"),
-      description: data.get("description"), price: data.get("price"), status:
+      (product) => { const li = document.createElement("li"); li.innerHTML = `
+      <h3>${product.title}</h3> <p>${product.description}</p> <p>Precio:
+      $${product.price}</p> <p>Stock: ${product.stock}</p> <p>Categoría:
+      ${product.category}</p> `; productList.appendChild(li); });
+      productForm.addEventListener("submit", (event) => {
+      event.preventDefault(); const data = new FormData(productForm); const
+      product = { title: data.get("title"), description:
+      data.get("description"), price: data.get("price"), status:
       data.get("status") === "on", stock: data.get("stock"), category:
-      data.get("category") }; socket.emit("addProduct", product); });
+      data.get("category"), }; socket.emit("addProduct", product);
+      productForm.reset(); });
     </script>
   </body>
 </html>
