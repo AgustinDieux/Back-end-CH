@@ -6,6 +6,24 @@ const path = require("path");
 const port = 9092;
 const http = require("http").Server(app);
 const io = require("socket.io")(http);
+const mongoose = require("mongoose");
+const Producto = require("./models/products.models");
+const Cart = require("./models/carts.models");
+const Message = require("./models/messages.models");
+const router = express.Router();
+
+const connectMongoDB = async () => {
+  try {
+    await mongoose.connect(
+      "mongodb+srv://agusdieux:CoderHouse@agustindieux.7cbx16o.mongodb.net/ecommerce?retryWrites=true&w=majority"
+    );
+    console.log("Conectado a MongoDB!");
+  } catch (error) {
+    console.error("Error de conexión:", error);
+  }
+};
+
+connectMongoDB();
 
 io.on("connection", (socket) => {
   console.log("Usuario conectado");
@@ -19,7 +37,12 @@ io.on("connection", (socket) => {
   });
 });
 
-app.engine("handlebars", exphbs.engine());
+app.engine(
+  "handlebars",
+  exphbs.engine({
+    layoutsDir: __dirname + "/views/layouts",
+  })
+);
 app.set("view engine", "handlebars");
 
 // Ruta para la vista de productos en tiempo real
@@ -40,6 +63,102 @@ let products = [];
 const productRouter = express.Router();
 var shoppingCart = [];
 let productsCart = [];
+
+productRouter.get("/products", async (req, res) => {
+  try {
+    // Busca todos los productos en la base de datos
+    const productos = await Producto.find();
+    // Envía una respuesta con los productos encontrados
+    res.status(200).json({ result: "success", payload: productos });
+  } catch (error) {
+    // Si hay un error, envía una respuesta con el mensaje de error
+    console.error(
+      "No se pudieron obtener los productos con Mongoose: " + error
+    );
+    res.status(500).json({
+      error: "No se pudieron obtener los productos con Mongoose",
+      message: error,
+    });
+  }
+});
+
+// Crea una nueva ruta para la petición POST
+productRouter.post("/products", async (req, res) => {
+  console.log("asdasdasdad", req);
+  try {
+    // Crea un nuevo producto con los datos recibidos en la petición
+    const producto = await Producto.create({
+      nombre: req.body.nombre,
+      descripcion: req.body.descripcion,
+      precio: req.body.precio,
+      cantidad: req.body.cantidad,
+    });
+    // Guarda el nuevo producto en la base de datos
+    await producto.save();
+
+    // Envía una respuesta con el producto creado
+    res.status(201).json(producto);
+  } catch (error) {
+    // Si hay un error, envía una respuesta con el mensaje de error
+    res.status(500).json({ error: error.message });
+  }
+});
+
+productRouter.get("/carts", async (req, res) => {
+  try {
+    const carts = await Cart.find();
+    res.status(200).json({ result: "success", payload: carts });
+  } catch (error) {
+    console.error("No se pudieron obtener los carritos con Mongoose: " + error);
+    res.status(500).json({
+      error: "No se pudieron obtener los carritos con Mongoose",
+      message: error,
+    });
+  }
+});
+
+productRouter.post("/carts", async (req, res) => {
+  try {
+    const cart = await Cart.create({
+      userId: req.body.userId,
+      products: req.body.products,
+      total: req.body.total,
+    });
+    await cart.save();
+    res.status(201).json(cart);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.set("views", "./views/layouts");
+app.set("view engine", "handlebars");
+
+productRouter.get("/chat", async (req, res) => {
+  try {
+    const messages = await Message.find();
+    res.render("chat", { title: "Chat", messages });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Error retrieving messages");
+  }
+});
+
+productRouter.post("/chat", async (req, res) => {
+  const { name, email, message } = req.body;
+  const newMessage = new Message({
+    name,
+    email,
+    message,
+  });
+  try {
+    await newMessage.save();
+    res.redirect("/chat");
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Error saving message");
+  }
+});
 
 // Obtener todos los productos con la limitación opcional
 productRouter.get("/", (req, res) => {
@@ -105,7 +224,7 @@ productRouter.delete("/:pid", (req, res) => {
   res.send("Producto eliminado");
 });
 
-app.use("/api/products", productRouter);
+app.use("/api/", productRouter);
 
 // Crear un nuevo carrito
 
