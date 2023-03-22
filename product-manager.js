@@ -131,6 +131,34 @@ productRouter.get("/products", async (req, res) => {
   }
 });
 
+productRouter.get("/products/:id", async (req, res) => {
+  try {
+    const productId = req.params.id;
+    const producto = await productoModel.findById(productId);
+
+    if (!producto) {
+      return res.status(404).json({ error: "Producto no encontrado" });
+    }
+
+    const product = {
+      nombre: producto.nombre,
+      descripcion: producto.descripcion,
+      precio: producto.precio,
+      id: producto._id,
+    };
+
+    res.render("layouts/product", { product });
+  } catch (error) {
+    console.error("No se pudo obtener el producto con Mongoose: " + error);
+    res
+      .status(500)
+      .json({
+        error: "No se pudo obtener el producto con Mongoose",
+        message: error,
+      });
+  }
+});
+
 // Crea una nueva ruta para la petición POST
 productRouter.post("/products", async (req, res) => {
   try {
@@ -180,6 +208,10 @@ productRouter.get("/carts", async (req, res) => {
 
 productRouter.post("/carts", async (req, res) => {
   try {
+    console.log(req.body);
+    console.log("userId:", req.body.userId);
+    console.log("products:", req.body.products);
+    console.log("total:", req.body.total);
     const cart = await Cart.create({
       userId: req.body.userId,
       products: req.body.products,
@@ -222,17 +254,17 @@ productRouter.delete("/carts/:cid/products/:pid", async (req, res) => {
 productRouter.get("/carts/:cid", async (req, res) => {
   try {
     const cartId = req.params.cid;
-    const cart = await Cart.findById(cartId).populate("productos");
-    const products = cart.productos.map((product) => {
+    const cart = await Cart.findById(cartId).populate("products.productId");
+    const products = cart.products.map((product) => {
       return {
-        nombre: product.nombre,
-        descripcion: product.descripcion,
-        precio: product.precio,
-        id: product._id,
+        nombre: product.productId.nombre,
+        descripcion: product.productId.descripcion,
+        precio: product.productId.precio,
+        id: product.productId._id,
       };
     });
 
-    res.render("layouts/cart", {
+    res.render("layouts/carts", {
       products,
     });
   } catch (error) {
@@ -322,7 +354,7 @@ productRouter.get("/carts/:cid", async (req, res) => {
     const cart = await Cart.findById(req.params.cid).populate(
       "products.productId"
     );
-    res.status(200).json(cart);
+    res.render("cart", { products: cart.products });
   } catch (error) {
     console.error("Error al obtener el carrito:", error);
     res
