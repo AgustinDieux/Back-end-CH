@@ -64,14 +64,63 @@ const productRouter = express.Router();
 var shoppingCart = [];
 let productsCart = [];
 
+const productoModel = require("./models/products.models");
+const mongoosePaginate = require("mongoose-paginate-v2");
+
 productRouter.get("/products", async (req, res) => {
   try {
-    // Busca todos los productos en la base de datos
-    const productos = await Producto.find();
-    // Envía una respuesta con los productos encontrados
-    res.status(200).json({ result: "success", payload: productos });
+    // Obtenemos los valores de los query params
+    const limit = req.query.limit || 10;
+    const page = req.query.page || 1;
+    const sort = req.query.sort || "";
+    const query = req.query.query || "";
+
+    // Realizamos la búsqueda según los query params recibidos
+    let queryObject = {};
+    if (query) {
+      queryObject = { nombre: query };
+    }
+    const options = {
+      sort:
+        sort === "asc" ? { precio: 1 } : sort === "desc" ? { precio: -1 } : "",
+      limit: parseInt(limit),
+      page: parseInt(page),
+    };
+    const productos = await productoModel.paginate(queryObject, options);
+
+    // Creamos el objeto de respuesta
+    const response = {
+      status: "success",
+      payload: productos.docs,
+      totalPages: productos.totalPages,
+      prevPage: productos.prevPage || null,
+      nextPage: productos.nextPage || null,
+      page: productos.page,
+      hasPrevPage: productos.hasPrevPage,
+      hasNextPage: productos.hasNextPage,
+      prevLink: productos.hasPrevPage
+        ? `/products?limit=${limit}&page=${productos.prevPage}&sort=${sort}&query=${query}`
+        : null,
+      nextLink: productos.hasNextPage
+        ? `/products?limit=${limit}&page=${productos.nextPage}&sort=${sort}&query=${query}`
+        : null,
+    };
+
+    const products = response.payload.map((product) => {
+      return {
+        nombre: product.nombre,
+        descripcion: product.descripcion,
+        precio: product.precio,
+        id: product._id,
+      };
+    });
+
+    // Enviamos la respuesta con los productos encontrados
+    res.render("layouts/products", {
+      products,
+    });
   } catch (error) {
-    // Si hay un error, envía una respuesta con el mensaje de error
+    // Si hay un error, enviamos una respuesta con el mensaje de error
     console.error(
       "No se pudieron obtener los productos con Mongoose: " + error
     );
@@ -84,23 +133,35 @@ productRouter.get("/products", async (req, res) => {
 
 // Crea una nueva ruta para la petición POST
 productRouter.post("/products", async (req, res) => {
-  console.log("asdasdasdad", req);
   try {
-    // Crea un nuevo producto con los datos recibidos en la petición
     const producto = await Producto.create({
       nombre: req.body.nombre,
       descripcion: req.body.descripcion,
       precio: req.body.precio,
       cantidad: req.body.cantidad,
     });
-    // Guarda el nuevo producto en la base de datos
     await producto.save();
 
-    // Envía una respuesta con el producto creado
-    res.status(201).json(producto);
+    // Crear objeto con las propiedades adicionales que quieres incluir
+    const response = {
+      status: "success",
+      payload: producto,
+      totalPages: null,
+      prevPage: null,
+      nextPage: null,
+      page: null,
+      hasPrevPage: false,
+      hasNextPage: false,
+      prevLink: null,
+      nextLink: null,
+    };
+
+    res.status(201).json(response);
   } catch (error) {
-    // Si hay un error, envía una respuesta con el mensaje de error
-    res.status(500).json({ error: error.message });
+    console.error("Error al crear el producto:", error);
+    res
+      .status(500)
+      .json({ error: "Error al crear el producto", message: error });
   }
 });
 
@@ -131,8 +192,144 @@ productRouter.post("/carts", async (req, res) => {
   }
 });
 
-app.set("views", "./views/layouts");
-app.set("view engine", "handlebars");
+productRouter.delete("/carts/:cid/products/:pid", async (req, res) => {
+  try {
+    const cart = await Cart.findById(req.params.cid);
+    if (!cart) {
+      return res.status(404).json({ error: "Carrito no encontrado" });
+    }
+
+    const productIndex = cart.products.findIndex(
+      (p) => p._id.toString() === req.params.pid
+    );
+    if (productIndex === -1) {
+      return res.status(404).json({ error: "Producto no encontrado" });
+    }
+
+    cart.products.splice(productIndex, 1);
+    await cart.save();
+
+    res.json({ message: "Producto eliminado del carrito" });
+  } catch (error) {
+    console.error("Error al eliminar el producto del carrito:", error);
+    res.status(500).json({
+      error: "Error al eliminar el producto del carrito",
+      message: error,
+    });
+  }
+});
+
+productRouter.get("/carts/:cid", async (req, res) => {
+  try {
+    const cartId = req.params.cid;
+    const cart = await Cart.findById(cartId).populate("productos");
+    const products = cart.productos.map((product) => {
+      return {
+        nombre: product.nombre,
+        descripcion: product.descripcion,
+        precio: product.precio,
+        id: product._id,
+      };
+    });
+
+    res.render("layouts/cart", {
+      products,
+    });
+  } catch (error) {
+    console.error("Error al obtener el carrito:", error);
+    res.status(500).json({
+      error: "Error al obtener el carrito",
+      message: error,
+    });
+  }
+});
+
+// PUT para actualizar un carrito
+productRouter.put("/carts/:cid", async (req, res) => {
+  try {
+    const cartId = req.params.cid;
+    const products = req.body.products;
+    const updatedCart = await Cart.findByIdAndUpdate(
+      cartId,
+      { products },
+      { new: true }
+    );
+    res.status(200).json({
+      message: `Carrito con ID ${cartId} actualizado con éxito`,
+      cart: updatedCart,
+    });
+  } catch (error) {
+    console.error("Error al actualizar el carrito:", error);
+    res.status(500).json({
+      error: "Error al actualizar el carrito",
+      message: error,
+    });
+  }
+});
+
+// PUT api/carts/:cid/products/:pid
+productRouter.put("/carts/:cid/products/:pid", async (req, res) => {
+  try {
+    // Obtener el carrito y el producto específico
+    const cart = await Cart.findById(req.params.cid);
+    const product = cart.products.find(
+      (product) => product.product == req.params.pid
+    );
+
+    // Actualizar la cantidad del producto en el carrito
+    product.quantity = req.body.quantity;
+    await cart.save();
+
+    res.status(200).json({
+      status: "success",
+      payload: cart,
+    });
+  } catch (error) {
+    console.error("Error al actualizar el producto:", error);
+    res
+      .status(500)
+      .json({ error: "Error al actualizar el producto", message: error });
+  }
+});
+
+productRouter.delete("/carts/:cid", async (req, res) => {
+  try {
+    const cart = await Cart.findById(req.params.cid);
+
+    if (!cart) {
+      return res.status(404).json({
+        error: `El carrito con id ${req.params.cid} no existe`,
+      });
+    }
+
+    cart.productos = []; // Elimina todos los productos del carrito
+    await cart.save();
+
+    res
+      .status(200)
+      .json({ result: "success", message: "Productos eliminados del carrito" });
+  } catch (error) {
+    console.error("Error al eliminar productos del carrito:", error);
+    res.status(500).json({
+      error: "Error al eliminar productos del carrito",
+      message: error,
+    });
+  }
+});
+
+productRouter.get("/carts/:cid", async (req, res) => {
+  try {
+    const cart = await Cart.findById(req.params.cid).populate(
+      "products.productId"
+    );
+    res.status(200).json(cart);
+  } catch (error) {
+    console.error("Error al obtener el carrito:", error);
+    res
+      .status(500)
+      .json({ error: "Error al obtener el carrito", message: error });
+  }
+});
 
 productRouter.get("/chat", async (req, res) => {
   try {
