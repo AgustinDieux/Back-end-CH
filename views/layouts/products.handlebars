@@ -6,6 +6,11 @@
   </head>
   <body>
     <h1>Listado de productos</h1>
+
+    <form action="/logout" method="POST">
+      <button type="submit">Logout</button>
+    </form>
+
     {{#each products}}
       <div>
         <h2>Nombre: {{this.nombre}}</h2>

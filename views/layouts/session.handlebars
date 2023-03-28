@@ -1,0 +1,51 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>{{title}}</title>
+  </head>
+  <body>
+    <h1>{{title}}</h1>
+    {{#if errorMessage}}
+      <p class="error">{{errorMessage}}</p>
+    {{/if}}
+
+    {{#if successMessage}}
+      <p class="success">{{successMessage}}</p>
+    {{/if}}
+
+    {{#if showRegisterForm}}
+      <h2>Registrarse</h2>
+      <form action="/register" method="post">
+        <label for="first_name">Nombre:</label>
+        <input type="text" name="first_name" id="first_name" />
+
+        <label for="last_name">Apellido:</label>
+        <input type="text" name="last_name" id="last_name" />
+
+        <label for="email">Correo electrónico:</label>
+        <input type="email" name="email" id="email" />
+
+        <label for="age">Edad:</label>
+        <input type="number" name="age" id="age" />
+
+        <label for="password">Contraseña:</label>
+        <input type="password" name="password" id="password" />
+
+        <button type="submit">Registrarse</button>
+      </form>
+    {{else}}
+      <h2>Iniciar sesión</h2>
+      <form action="/login" method="post">
+        <label for="email">Correo electrónico:</label>
+        <input type="email" name="email" id="email" />
+
+        <label for="password">Contraseña:</label>
+        <input type="password" name="password" id="password" />
+
+        <button type="submit">Iniciar sesión</button>
+      </form>
+      <p>¿No tienes una cuenta?
+        <a href="/session?register=true">Regístrate aquí</a>.</p>
+    {{/if}}
+  </body>
+</html>

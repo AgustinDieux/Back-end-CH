@@ -10,7 +10,9 @@ const mongoose = require("mongoose");
 const Producto = require("./models/products.models");
 const Cart = require("./models/carts.models");
 const Message = require("./models/messages.models");
+const userModel = require("./models/users.models.js");
 const router = express.Router();
+const session = require("express-session");
 
 const connectMongoDB = async () => {
   try {
@@ -57,6 +59,81 @@ app.get("/", (req, res) => {
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(
+  session({
+    secret: "EstaEsUnaCadenaDeTextoMuyLargaYCompl3jaParaFirmarLaSesion",
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+
+router.post("/register", async (req, res) => {
+  console.log("Register route hit");
+  const { first_name, last_name, email, age, password } = req.body;
+  console.log("Request body:", req.body);
+
+  // Verificar que el correo electrónico no está ya registrado
+  const existingUser = await userModel.findOne({ email });
+  console.log("Existing user:", existingUser);
+  if (existingUser) {
+    return res.redirect(
+      "/session?error=El correo electrónico ya está registrado"
+    );
+  }
+
+  // Crear y guardar un nuevo usuario en la base de datos
+  const newUser = new userModel({
+    first_name,
+    last_name,
+    email,
+    age,
+    password,
+  });
+  console.log("New user:", newUser);
+  await newUser.save();
+
+  // Redirigir al usuario a la página de inicio de sesión
+  res.redirect("/session");
+});
+
+router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  // Verificar las credenciales del usuario
+  const user = await userModel.findOne({ email });
+  if (!user || user.password !== password) {
+    return res.redirect("/session?error=Credenciales inválidas");
+  }
+
+  // Asignar el rol al usuario
+  if (email === "adminCoder@coder.com" && password === "adminCod3r123") {
+    user.role = "admin";
+  } else {
+    user.role = "usuario";
+  }
+  await user.save();
+
+  // Redirigir al usuario a la página de productos
+  res.redirect("/api/products");
+});
+
+router.post("/logout", (req, res) => {
+  // Destruir la sesión del usuario
+  req.session.destroy();
+
+  // Redirigir al usuario a la vista de login
+  res.redirect("/session");
+});
+
+app.get("/session", (req, res) => {
+  res.render("layouts/session", {
+    title: "Inicio de sesión",
+    errorMessage: req.query.error,
+    successMessage: req.query.success,
+    showRegisterForm: req.query.register === "true",
+  });
+});
 
 let products = [];
 
@@ -118,6 +195,7 @@ productRouter.get("/products", async (req, res) => {
     // Enviamos la respuesta con los productos encontrados
     res.render("layouts/products", {
       products,
+      user: req.user, // Pasamos los datos del usuario a la vista
     });
   } catch (error) {
     // Si hay un error, enviamos una respuesta con el mensaje de error
@@ -150,12 +228,10 @@ productRouter.get("/products/:id", async (req, res) => {
     res.render("layouts/product", { product });
   } catch (error) {
     console.error("No se pudo obtener el producto con Mongoose: " + error);
-    res
-      .status(500)
-      .json({
-        error: "No se pudo obtener el producto con Mongoose",
-        message: error,
-      });
+    res.status(500).json({
+      error: "No se pudo obtener el producto con Mongoose",
+      message: error,
+    });
   }
 });
 
@@ -453,6 +529,7 @@ productRouter.delete("/:pid", (req, res) => {
   res.send("Producto eliminado");
 });
 
+app.use("/", router);
 app.use("/api/", productRouter);
 
 // Crear un nuevo carrito
