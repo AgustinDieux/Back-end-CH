@@ -13,6 +13,10 @@ const Message = require("./models/messages.models");
 const userModel = require("./models/users.models.js");
 const router = express.Router();
 const session = require("express-session");
+const bcrypt = require("bcrypt");
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
+const GitHubStrategy = require("passport-github2").Strategy;
 
 const connectMongoDB = async () => {
   try {
@@ -68,6 +72,75 @@ app.use(
   })
 );
 
+passport.use(
+  new LocalStrategy(
+    { usernameField: "email" }, // Usa el campo 'email' como nombre de usuario
+    async (email, password, done) => {
+      try {
+        const user = await userModel.findOne({ email });
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+          return done(null, false, { message: "Credenciales inválidas" });
+        }
+        return done(null, user);
+      } catch (err) {
+        return done(err);
+      }
+    }
+  )
+);
+
+// Serializar y deserializar al usuario para mantenerlo en la sesión
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  console.log("Deserializing user with id:", id);
+  try {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return done(null, null);
+    }
+    const user = await userModel.findOne({ _id: id });
+    done(null, user);
+  } catch (err) {
+    done(err);
+  }
+});
+
+app.use(
+  session({
+    secret: "tu secreto aquí",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+passport.use(
+  new GitHubStrategy(
+    {
+      clientID: "Iv1.e14a54e9bc474a88",
+      clientSecret: "1514d43952430c460ef7f5ee2c065f94e1684345",
+      callbackURL: "http://localhost:9092/auth/github/callback",
+    },
+    function (accessToken, refreshToken, profile, cb) {
+      return cb(null, profile);
+    }
+  )
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.get("/auth/github", passport.authenticate("github"));
+
+app.get(
+  "/auth/github/callback",
+  passport.authenticate("github", {
+    successRedirect: "/api/products",
+    failureRedirect: "/login",
+  })
+);
+
 router.post("/register", async (req, res) => {
   console.log("Register route hit");
   const { first_name, last_name, email, age, password } = req.body;
@@ -82,48 +155,57 @@ router.post("/register", async (req, res) => {
     );
   }
 
-  // Crear y guardar un nuevo usuario en la base de datos
+  // Hashear la contraseña antes de guardarla en la base de datos
+  const saltRounds = 10;
+  const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+  // Crear y guardar un nuevo usuario en la base de datos con la contraseña hasheada
   const newUser = new userModel({
     first_name,
     last_name,
     email,
     age,
-    password,
+    password: hashedPassword,
   });
   console.log("New user:", newUser);
   await newUser.save();
 
-  // Redirigir al usuario a la página de inicio de sesión
-  res.redirect("/session");
+  // Iniciar sesión automáticamente al usuario después del registro
+  req.login(newUser, (err) => {
+    if (err) {
+      return next(err);
+    }
+    return res.redirect("/api/products");
+  });
 });
 
-router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+router.post(
+  "/login",
+  passport.authenticate("local", {
+    failureRedirect: "/session?error=Credenciales inválidas",
+  }),
+  async (req, res) => {
+    // Asignar el rol al usuario
+    if (
+      req.user.email === "adminCoder@coder.com" &&
+      req.body.password === "adminCod3r123"
+    ) {
+      req.user.role = "admin";
+    } else {
+      req.user.role = "usuario";
+    }
+    await req.user.save();
 
-  // Verificar las credenciales del usuario
-  const user = await userModel.findOne({ email });
-  if (!user || user.password !== password) {
-    return res.redirect("/session?error=Credenciales inválidas");
+    // Redirigir al usuario a la página de productos
+    res.redirect("/api/products");
   }
-
-  // Asignar el rol al usuario
-  if (email === "adminCoder@coder.com" && password === "adminCod3r123") {
-    user.role = "admin";
-  } else {
-    user.role = "usuario";
-  }
-  await user.save();
-
-  // Redirigir al usuario a la página de productos
-  res.redirect("/api/products");
-});
+);
 
 router.post("/logout", (req, res) => {
-  // Destruir la sesión del usuario
-  req.session.destroy();
-
-  // Redirigir al usuario a la vista de login
-  res.redirect("/session");
+  req.logout(() => {
+    req.session.destroy();
+    res.redirect("/session");
+  });
 });
 
 app.get("/session", (req, res) => {
