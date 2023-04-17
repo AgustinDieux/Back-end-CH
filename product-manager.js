@@ -217,6 +217,10 @@ app.get("/session", (req, res) => {
   });
 });
 
+router.get("/current", (req, res) => {
+  res.send(req.user);
+});
+
 let products = [];
 
 const productRouter = express.Router();
