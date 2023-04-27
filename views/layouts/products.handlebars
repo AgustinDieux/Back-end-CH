@@ -11,6 +11,9 @@
       <button type="submit">Logout</button>
     </form>
 
+    <p>Productos en el carrito: {{cart.products.length}}</p>
+    <a href="/cart/{{cart._id}}">Ir al carrito</a>
+
     {{#each products}}
       <div>
         <h2>Nombre: {{this.nombre}}</h2>
