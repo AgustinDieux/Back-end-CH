@@ -1,11 +1,14 @@
 const Cart = require("../models/carts.models");
 const cartDao = require("../dao/cart.dao");
+const CartDTO = require("../dto/cart.dto");
 
 async function getCart(req, res) {
   try {
     const { id } = req.params;
     const cart = await Cart.findById(id).populate("products");
-    res.render("cart", { cart });
+    const cartDTO = new CartDTO(cart);
+    console.log("hola", cartDTO.products);
+    res.render("layouts/carts", { cart: id, products: cartDTO.products });
   } catch (error) {
     console.error(error);
     res.status(500).send("Error obteniendo carrito");
@@ -16,10 +19,10 @@ async function addToCart(req, res) {
   try {
     const { id } = req.params;
     const { productId } = req.body;
-    const cart = await Cart.findById(id);
-    cart.products.push(productId);
-    await cart.save();
-    res.status(200).send("Producto agregado al carrito exitosamente");
+    await cartDao.addProduct(id, productId);
+    const cart = await cartDao.findById(id);
+    const cartDTO = new CartDTO(cart);
+    res.status(200).json(cartDTO);
   } catch (error) {
     console.error(error);
     res.status(500).send("Error agregando producto al carrito");

@@ -12,16 +12,30 @@
     </form>
 
     <p>Productos en el carrito: {{cart.products.length}}</p>
-    <a href="/cart/{{cart._id}}">Ir al carrito</a>
+    <a href="/api/cart/{{cart._id}}">Ir al carrito</a>
 
     {{#each products}}
       <div>
         <h2>Nombre: {{this.nombre}}</h2>
         <p>Descripcion: {{this.descripcion}}</p>
         <p>Precio: ${{this.precio}}</p>
+        <p>Stock: {{this.cantidad}}</p>
         <a href="/products/{{this.id}}">Ver detalles</a>
         <button class="add-to-cart" data-id="{{this.id}}">Agregar al carrito</button>
       </div>
     {{/each}}
+
+    <script>
+      console.log("Código JavaScript cargado"); const addToCartButtons =
+      document.querySelectorAll(".add-to-cart");
+      addToCartButtons.forEach((button) => { button.addEventListener("click",
+      async (event) => { const productId = event.target.dataset.id;
+      console.log(`ID del producto: ${productId}`); const response = await
+      fetch(`/api/cart/{{cart._id}}`, { method: "POST", headers: {
+      "Content-Type": "application/json", }, body: JSON.stringify({ productId
+      }), }); console.log(`Respuesta de la solicitud POST: ${response.status}`);
+      if (response.ok) { console.log("Producto agregado al carrito"); } else {
+      console.error("Error agregando producto al carrito"); } }); });
+    </script>
   </body>
 </html>

@@ -23,6 +23,7 @@ const cartRouter = require("./routes/cart.routes.js");
 const authRoutes = require("./routes/auth.routes.js");
 const dotenv = require("dotenv");
 const config = require("./config.js");
+const ticketRouter = require("./routes/ticket.route");
 console.log(config.dbUser);
 
 const {
@@ -87,6 +88,9 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Ruta para la vista de productos en tiempo real
 app.get("/real-time-products", (req, res) => {
@@ -492,6 +496,7 @@ app.use("/", router);
 app.use("/api/", productRouter);
 app.use("/api/", cartRouter);
 app.use("/", authRoutes);
+app.use("/tickets", ticketRouter);
 
 // Crear un nuevo carrito
 

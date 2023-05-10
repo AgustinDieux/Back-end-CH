@@ -1,18 +1,42 @@
-<!-- cart.handlebars -->
-
 <html>
-  <head>
-    <title>Carrito de compras</title>
-  </head>
-  <body>
-    <h1>Carrito de compras</h1>
-    <h2>Productos en el carrito:</h2>
-    {{#each products}}
-      <div>
-        <h3>{{this.nombre}}</h3>
-        <p>{{this.descripcion}}</p>
-        <p>Precio: ${{this.precio}}</p>
-      </div>
-    {{/each}}
-  </body>
+
+<head>
+  <title>Carrito de compras</title>
+</head>
+
+<body>
+  <h1>Carrito de compras</h1>
+  <h2>Productos en el carrito:</h2>
+  {{#each products}}
+  <div>
+    <h3>{{this.productId}}</h3>
+    <p>{{this.descripcion}}</p>
+    <p>Precio: ${{this.price}}</p>
+  </div>
+  {{/each}}
+  <button value={{cart}} id="checkout-button" onclick="createTicket()">Finalizar compra</button>
+
+  <script>
+    function createTicket() {
+      const checkoutButton =
+        document.querySelector('#checkout-button'); const cartId =
+          checkoutButton.value; console.log('Iniciando f');
+      console.log('cartId:', cartId); fetch('/tickets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+          cartId: cartId
+        })
+      }).then(response => {
+        if (response.ok) {
+          return
+          response.json();
+        } throw new Error('Error al finalizar compra');
+      })
+        .then(ticket => { console.log(ticket); }).catch(error => {
+          console.error(error);
+        });
+    }
+  </script>
+</body>
+
 </html>

@@ -1,10 +1,17 @@
 const Producto = require("../models/products.models");
+const productDAO = require("../dao/product.dao");
+const ProductDTO = require("../dto/product.dto");
+const Cart = require("../models/carts.models");
 
 async function getAllProducts(req, res) {
   try {
-    const products = await Producto.find();
-    console.log(products);
-    res.render("layouts/products", { products });
+    const products = await productDAO.findAll();
+    // Obtener el ID del carrito del usuario actual
+    const cartId = req.user.cart;
+    // Buscar el carrito en la base de datos utilizando el ID del carrito
+    const cart = await Cart.findById(cartId);
+    // Renderizar la vista layouts/products y pasarle los objetos products y cart
+    res.render("layouts/products", { products, cart });
   } catch (error) {
     console.error(error);
     res.status(500).send("Error obteniendo productos");
@@ -15,7 +22,8 @@ async function getProductById(req, res) {
   try {
     const { id } = req.params;
     const product = await Producto.findById(id);
-    res.render("productDetail", { product });
+    const productDTO = new ProductDTO(product);
+    res.render("productDetail", { product: productDTO });
   } catch (error) {
     console.error(error);
     res.status(500).send("Error obteniendo detalle del producto");

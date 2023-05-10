@@ -3,6 +3,7 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const userModel = require("../models/users.models.js");
 const mongoose = require("mongoose");
+const cartDao = require("../dao/cart.dao");
 
 passport.use(
   new LocalStrategy(
@@ -40,16 +41,23 @@ passport.deserializeUser(async (id, done) => {
 });
 
 exports.login = (req, res, next) => {
-  passport.authenticate("local", (err, user, info) => {
+  passport.authenticate("local", async (err, user, info) => {
     if (err) {
       return next(err);
     }
     if (!user) {
       return res.redirect("/login?error=Credenciales inválidas");
     }
-    req.logIn(user, (err) => {
+    req.logIn(user, async (err) => {
       if (err) {
         return next(err);
+      }
+      // Verifica si el usuario ya tiene un carrito asociado
+      if (!user.cart) {
+        // Crea un nuevo carrito y asocia el ID con el usuario
+        const newCart = await cartDao.create({});
+        user.cart = newCart.id;
+        await user.save();
       }
       // Redirige al usuario a la ruta '/api/productsdos'
       return res.redirect("/api/productsdos");
@@ -68,6 +76,7 @@ exports.logout = (req, res) => {
     res.redirect("/session");
   });
 };
+
 exports.register = async (req, res, next) => {
   try {
     console.log("Recibiendo solicitud de registro:", req.body);
