@@ -2,6 +2,7 @@ const Producto = require("../models/products.models");
 const productDAO = require("../dao/product.dao");
 const ProductDTO = require("../dto/product.dto");
 const Cart = require("../models/carts.models");
+const { generateMockProducts } = require("../mockings/mocking");
 
 async function getAllProducts(req, res) {
   try {
@@ -21,6 +22,10 @@ async function getAllProducts(req, res) {
 async function getProductById(req, res) {
   try {
     const { id } = req.params;
+    if (id === "mockingproducts") {
+      const mockProducts = generateMockProducts();
+      return res.json(mockProducts);
+    }
     const product = await Producto.findById(id);
     const productDTO = new ProductDTO(product);
     res.render("productDetail", { product: productDTO });
