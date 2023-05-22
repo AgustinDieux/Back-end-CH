@@ -1,11 +1,12 @@
 const Cart = require("../models/carts.models");
 const productosDao = require("../dao/product.dao");
+const logger = require("../logger");
 
 async function findById(id) {
   try {
     return await Cart.findById(id);
   } catch (error) {
-    console.error(error);
+    logger.error("Error obteniendo carrito por ID", error);
     throw new Error("Error obteniendo carrito por ID");
   }
 }
@@ -16,7 +17,7 @@ async function create(data) {
     await newCart.save();
     return newCart; // Devuelve el carrito recién creado
   } catch (error) {
-    console.error(error);
+    logger.error("Error creando carrito", error);
     throw new Error("Error creando carrito");
   }
 }
@@ -37,7 +38,7 @@ async function addProduct(cartId, productId) {
     cart.products.push(newProduct);
     await cart.save();
   } catch (error) {
-    console.error(error);
+    logger.error("Error agregando producto al carrito", error);
     throw new Error("Error agregando producto al carrito");
   }
 }
@@ -48,7 +49,7 @@ async function removeProduct(cartId, productId) {
     cart.products = cart.products.filter((p) => p.toString() !== productId);
     await cart.save();
   } catch (error) {
-    console.error(error);
+    logger.error("Error eliminando producto del carrito", error);
     throw new Error("Error eliminando producto del carrito");
   }
 }

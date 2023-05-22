@@ -25,6 +25,8 @@ const dotenv = require("dotenv");
 const config = require("./config.js");
 const ticketRouter = require("./routes/ticket.route.js");
 const mockingRoute = require("./routes/mocking.routes");
+const logger = require("./logger");
+const loggerRouter = require("./routes/logger.route.js");
 console.log(config.dbUser);
 
 const {
@@ -499,6 +501,7 @@ app.use("/api/", cartRouter);
 app.use("/", authRoutes);
 app.use("/tickets", ticketRouter);
 app.use("/api", mockingRoute);
+app.use(loggerRouter);
 
 // Crear un nuevo carrito
 

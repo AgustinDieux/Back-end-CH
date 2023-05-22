@@ -3,6 +3,7 @@ const productDAO = require("../dao/product.dao");
 const ProductDTO = require("../dto/product.dto");
 const Cart = require("../models/carts.models");
 const { generateMockProducts } = require("../mockings/mocking");
+const logger = require("../logger");
 
 async function getAllProducts(req, res) {
   try {
@@ -14,7 +15,7 @@ async function getAllProducts(req, res) {
     // Renderizar la vista layouts/products y pasarle los objetos products y cart
     res.render("layouts/products", { products, cart });
   } catch (error) {
-    console.error(error);
+    logger.error("Error obteniendo productos", error);
     res.status(500).send("Error obteniendo productos");
   }
 }
@@ -30,7 +31,7 @@ async function getProductById(req, res) {
     const productDTO = new ProductDTO(product);
     res.render("productDetail", { product: productDTO });
   } catch (error) {
-    console.error(error);
+    logger.error("Error obteniendo detalle del producto", error);
     res.status(500).send("Error obteniendo detalle del producto");
   }
 }
@@ -42,7 +43,7 @@ async function createProduct(req, res) {
     await newProduct.save();
     res.status(201).send("Producto creado exitosamente");
   } catch (error) {
-    console.error(error);
+    logger.error("Error creando producto", error);
     res.status(500).send("Error creando producto");
   }
 }

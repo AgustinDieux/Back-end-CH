@@ -1,16 +1,17 @@
 const Cart = require("../models/carts.models");
 const cartDao = require("../dao/cart.dao");
 const CartDTO = require("../dto/cart.dto");
+const logger = require("../logger");
 
 async function getCart(req, res) {
   try {
     const { id } = req.params;
     const cart = await Cart.findById(id).populate("products");
     const cartDTO = new CartDTO(cart);
-    console.log("hola", cartDTO.products);
+    logger.info("hola", cartDTO.products);
     res.render("layouts/carts", { cart: id, products: cartDTO.products });
   } catch (error) {
-    console.error(error);
+    logger.error("Error obteniendo carrito", error);
     res.status(500).send("Error obteniendo carrito");
   }
 }
@@ -24,7 +25,7 @@ async function addToCart(req, res) {
     const cartDTO = new CartDTO(cart);
     res.status(200).json(cartDTO);
   } catch (error) {
-    console.error(error);
+    logger.error("Error agregando producto al carrito", error);
     res.status(500).send("Error agregando producto al carrito");
   }
 }
@@ -38,7 +39,7 @@ async function removeFromCart(req, res) {
     await cart.save();
     res.status(200).send("Producto eliminado del carrito exitosamente");
   } catch (error) {
-    console.error(error);
+    logger.error("Error eliminando producto del carrito", error);
     res.status(500).send("Error eliminando producto del carrito");
   }
 }
@@ -48,7 +49,7 @@ async function createCart(req, res) {
     const newCart = await cartDao.create({});
     res.status(201).json(newCart);
   } catch (error) {
-    console.error(error);
+    logger.error("Error creando carrito", error);
     res.status(500).send("Error creando carrito");
   }
 }

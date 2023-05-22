@@ -4,6 +4,7 @@ const LocalStrategy = require("passport-local").Strategy;
 const userModel = require("../models/users.models.js");
 const mongoose = require("mongoose");
 const cartDao = require("../dao/cart.dao");
+const logger = require("../logger");
 
 passport.use(
   new LocalStrategy(
@@ -28,7 +29,7 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser(async (id, done) => {
-  console.log("Deserializing user with id:", id);
+  logger.info("Deserializing user with id:", id);
   try {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return done(null, null);
@@ -69,7 +70,7 @@ exports.logout = (req, res) => {
   req.logout((err) => {
     if (err) {
       // Manejar el error
-      console.error(err);
+      logger.error(err);
       return res.redirect("/error");
     }
     req.session.destroy();
@@ -79,11 +80,11 @@ exports.logout = (req, res) => {
 
 exports.register = async (req, res, next) => {
   try {
-    console.log("Recibiendo solicitud de registro:", req.body);
+    logger.info("Recibiendo solicitud de registro:", req.body);
     const { first_name, last_name, email, age, password } = req.body;
     // Crea un hash de la contraseña
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log("Contraseña encriptada:", hashedPassword);
+    logger.info("Contraseña encriptada:", hashedPassword);
     // Crea un nuevo usuario en la base de datos
     const newUser = new userModel({
       first_name,
@@ -93,11 +94,11 @@ exports.register = async (req, res, next) => {
       password: hashedPassword,
     });
     await newUser.save();
-    console.log("Usuario creado:", newUser);
+    logger.info("Usuario creado:", newUser);
     // Redirige al usuario a la página de inicio de sesión
     res.redirect("/session");
   } catch (err) {
-    console.error("Error al registrar al usuario:", err);
+    logger.error("Error al registrar al usuario:", err);
     // ... manejo de errores ...
   }
 };

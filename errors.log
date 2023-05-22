@@ -1,0 +1,24 @@
+[2023-05-22 14:16:50] info: Obteniendo todos los productos
+[2023-05-22 14:22:55] info: Deserializing user with id:
+[2023-05-22 14:22:55] info: Obteniendo todos los productos
+[2023-05-22 14:22:55] info: Deserializing user with id:
+[2023-05-22 14:23:10] info: Deserializing user with id:
+[2023-05-22 14:23:13] info: Deserializing user with id:
+[2023-05-22 14:23:14] info: Deserializing user with id:
+[2023-05-22 14:23:14] info: Deserializing user with id:
+[2023-05-22 14:23:21] info: Deserializing user with id:
+[2023-05-22 14:23:23] info: Deserializing user with id:
+[2023-05-22 14:23:24] info: Deserializing user with id:
+[2023-05-22 14:23:24] info: Obteniendo todos los productos
+[2023-05-22 14:23:25] info: Deserializing user with id:
+[2023-05-22 14:25:38] info: Obteniendo todos los productos
+[2023-05-22 14:25:38] error: Error obteniendo productos Cannot read properties of undefined (reading 'cart')
+[2023-05-22 14:25:42] info: Deserializing user with id:
+[2023-05-22 14:25:42] info: Obteniendo todos los productos
+[2023-05-22 14:25:43] info: Deserializing user with id:
+[2023-05-22 14:25:45] info: Deserializing user with id:
+[2023-05-22 14:25:45] info: Obteniendo producto por ID
+[2023-05-22 14:25:47] info: Deserializing user with id:
+[2023-05-22 14:25:47] info: hola
+[2023-05-22 14:25:48] info: Deserializing user with id:
+[2023-05-22 14:25:52] info: Deserializing user with id:
