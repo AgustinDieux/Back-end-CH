@@ -26,6 +26,7 @@ const config = require("./config.js");
 const ticketRouter = require("./routes/ticket.route.js");
 const mockingRoute = require("./routes/mocking.routes");
 const logger = require("./logger");
+const userRoutes = require("./routes/user.route");
 const loggerRouter = require("./routes/logger.route.js");
 console.log(config.dbUser);
 
@@ -502,6 +503,7 @@ app.use("/", authRoutes);
 app.use("/tickets", ticketRouter);
 app.use("/api", mockingRoute);
 app.use(loggerRouter);
+app.use("/api/users", userRoutes);
 
 // Crear un nuevo carrito
 

@@ -8,3 +8,10 @@ exports.createUser = async (userData) => {
 exports.getUserByEmail = async (email) => {
   return await userModel.findOne({ email });
 };
+
+exports.updateResetToken = async (userId, token, expiration) => {
+  await userModel.updateOne(
+    { _id: userId },
+    { resetToken: token, resetTokenExpires: expiration }
+  );
+};

@@ -48,4 +48,29 @@ async function createProduct(req, res) {
   }
 }
 
-module.exports = { getAllProducts, getProductById, createProduct };
+async function deleteProduct(req, res) {
+  try {
+    const { id } = req.params;
+    const product = await Producto.findById(id);
+    if (!product) {
+      return res.status(404).send("Producto no encontrado");
+    }
+    // Verificar si el usuario es admin o si es el propietario del producto
+    if (req.user.role === "admin" || req.user.email === product.owner) {
+      await product.remove();
+      res.send("Producto eliminado exitosamente");
+    } else {
+      res.status(403).send("No tienes permiso para eliminar este producto");
+    }
+  } catch (error) {
+    logger.error("Error eliminando producto", error);
+    res.status(500).send("Error eliminando producto");
+  }
+}
+
+module.exports = {
+  getAllProducts,
+  getProductById,
+  createProduct,
+  deleteProduct,
+};

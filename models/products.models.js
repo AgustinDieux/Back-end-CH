@@ -20,6 +20,11 @@ const productoSchema = new mongoose.Schema({
     required: true,
     min: 0,
   },
+  owner: {
+    type: String,
+    ref: "users",
+    default: "admin",
+  },
 });
 
 productoSchema.plugin(mongoosePaginate);

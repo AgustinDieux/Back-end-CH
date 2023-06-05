@@ -11,5 +11,6 @@ router.post(
   authorizationMiddleware,
   productController.createProduct
 );
+router.delete("/:id", authorizationMiddleware, productController.deleteProduct);
 
 module.exports = router;

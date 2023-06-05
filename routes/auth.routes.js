@@ -14,4 +14,13 @@ router.post("/logout", authController.logout);
 
 router.post("/register", authController.register);
 
+// Agregar la ruta GET para /reset-password
+router.get("/reset-password", (req, res) => {
+  res.render("layouts/reset-password");
+});
+
+router.post("/reset-password", authController.requestPasswordReset);
+
+router.post("/reset-password/:token", authController.resetPassword);
+
 module.exports = router;

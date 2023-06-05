@@ -2,6 +2,7 @@ const Cart = require("../models/carts.models");
 const cartDao = require("../dao/cart.dao");
 const CartDTO = require("../dto/cart.dto");
 const logger = require("../logger");
+const Producto = require("../models/products.models");
 
 async function getCart(req, res) {
   try {
@@ -20,6 +21,14 @@ async function addToCart(req, res) {
   try {
     const { id } = req.params;
     const { productId } = req.body;
+    // Buscar el producto en la base de datos
+    const product = await Producto.findById(productId);
+    // Verificar si el producto pertenece al usuario actual
+    if (req.user.role === "premium" && req.user.email === product.owner) {
+      return res
+        .status(403)
+        .send("No puedes agregar tu propio producto a tu carrito");
+    }
     await cartDao.addProduct(id, productId);
     const cart = await cartDao.findById(id);
     const cartDTO = new CartDTO(cart);

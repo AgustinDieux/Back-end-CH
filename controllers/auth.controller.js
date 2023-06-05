@@ -5,6 +5,9 @@ const userModel = require("../models/users.models.js");
 const mongoose = require("mongoose");
 const cartDao = require("../dao/cart.dao");
 const logger = require("../logger");
+const emailService = require("../email.service.js");
+const crypto = require("crypto");
+const authDao = require("../dao/auth.dao.js");
 
 passport.use(
   new LocalStrategy(
@@ -99,6 +102,90 @@ exports.register = async (req, res, next) => {
     res.redirect("/session");
   } catch (err) {
     logger.error("Error al registrar al usuario:", err);
+    // ... manejo de errores ...
+  }
+};
+
+exports.requestPasswordReset = async (req, res) => {
+  try {
+    console.log(
+      "Recibiendo solicitud de restablecimiento de contraseña:",
+      req.body
+    );
+    const { email } = req.body;
+    const user = await userModel.findOne({ email });
+
+    if (!user) {
+      console.log("El correo electrónico no está registrado:", email);
+      return res.render("reset-password", {
+        message: "El correo electrónico no está registrado",
+      });
+    }
+
+    // Generar el token y la fecha de expiración
+    const token = crypto.randomBytes(32).toString("hex");
+    const expiration = Date.now() + 60 * 60 * 1000; // 1 hora de expiración
+
+    // Actualizar el token y la fecha de expiración del usuario en la base de datos
+    await authDao.updateResetToken(user._id, token, expiration);
+
+    // Enviar el correo electrónico con el enlace de restablecimiento de contraseña
+    const resetLink = `http://tu-sitio.com/reset-password/${token}`;
+    const message = `Haz clic en el siguiente enlace para restablecer tu contraseña: ${resetLink}`;
+
+    console.log(
+      "Enviando correo electrónico con el enlace de restablecimiento:",
+      resetLink
+    );
+    await emailService.sendEmail(
+      user.email,
+      "Restablecimiento de contraseña",
+      message
+    );
+    console.log("Correo electrónico enviado con éxito");
+
+    // Redirigir al cliente a otra página o enviar un mensaje de éxito
+    res.redirect(
+      "/login?success=Se ha enviado un correo electrónico con instrucciones para restablecer tu contraseña"
+    );
+  } catch (err) {
+    console.error(
+      "Error al procesar la solicitud de restablecimiento de contraseña:",
+      err
+    );
+    // ... manejo de errores ...
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token, password } = req.body;
+    const user = await userModel.findOne({ resetToken: token });
+
+    if (!user || Date.now() > user.resetTokenExpires) {
+      return res.render("reset-password", {
+        message:
+          "El enlace ha expirado. Por favor, solicita nuevamente el restablecimiento de contraseña.",
+      });
+    }
+
+    if (await bcrypt.compare(password, user.password)) {
+      return res.render("reset-password", {
+        message:
+          "No puedes utilizar la misma contraseña anterior. Por favor, elige una contraseña diferente.",
+      });
+    }
+
+    // Actualizar la contraseña y limpiar el token de restablecimiento
+    user.password = await bcrypt.hash(password, 10);
+    user.resetToken = undefined;
+    user.resetTokenExpires = undefined;
+    await user.save();
+
+    res.render("reset-password", {
+      message: "Tu contraseña ha sido restablecida con éxito",
+    });
+  } catch (err) {
     // ... manejo de errores ...
   }
 };

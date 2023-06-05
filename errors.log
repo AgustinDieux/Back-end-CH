@@ -22,3 +22,43 @@
 [2023-05-22 14:25:47] info: hola
 [2023-05-22 14:25:48] info: Deserializing user with id:
 [2023-05-22 14:25:52] info: Deserializing user with id:
+[2023-06-05 12:06:32] info: Deserializing user with id:
+[2023-06-05 12:06:32] info: Obteniendo todos los productos
+[2023-06-05 12:06:33] info: Deserializing user with id:
+[2023-06-05 12:06:37] info: Deserializing user with id:
+[2023-06-05 12:06:37] info: hola
+[2023-06-05 12:06:38] info: Deserializing user with id:
+[2023-06-05 12:06:40] info: Deserializing user with id:
+[2023-06-05 12:06:41] info: Deserializing user with id:
+[2023-06-05 12:28:29] info: Recibiendo solicitud de registro:
+[2023-06-05 12:28:29] info: Contraseña encriptada:
+[2023-06-05 12:28:29] info: Usuario creado:
+[2023-06-05 13:50:48] info: Deserializing user with id:
+[2023-06-05 13:50:48] info: Obteniendo todos los productos
+[2023-06-05 13:50:48] info: Deserializing user with id:
+[2023-06-05 13:50:51] info: Deserializing user with id:
+[2023-06-05 13:50:51] info: hola
+[2023-06-05 13:50:51] info: Deserializing user with id:
+[2023-06-05 13:50:55] info: Deserializing user with id:
+[2023-06-05 13:54:33] info: Deserializing user with id:
+[2023-06-05 13:54:52] info: Recibiendo solicitud de registro:
+[2023-06-05 13:54:52] info: Contraseña encriptada:
+[2023-06-05 13:54:53] info: Usuario creado:
+[2023-06-05 14:54:13] info: Deserializing user with id:
+[2023-06-05 14:54:13] info: Obteniendo todos los productos
+[2023-06-05 14:54:14] info: Deserializing user with id:
+[2023-06-05 14:54:15] info: Deserializing user with id:
+[2023-06-05 14:55:05] info: Deserializing user with id:
+[2023-06-05 14:55:05] info: Obteniendo todos los productos
+[2023-06-05 14:55:06] info: Deserializing user with id:
+[2023-06-05 14:55:09] info: Deserializing user with id:
+[2023-06-05 14:55:09] info: hola
+[2023-06-05 14:55:10] info: Deserializing user with id:
+[2023-06-05 14:55:13] info: Deserializing user with id:
+[2023-06-05 14:55:21] info: Deserializing user with id:
+[2023-06-05 14:55:21] info: Deserializing user with id:
+[2023-06-05 14:55:44] error: Error cambiando rol del usuario Cast to ObjectId failed for value ":uid" (type string) at path "_id" for model "users"
+[2023-06-05 14:59:36] info: Deserializing user with id:
+[2023-06-05 14:59:36] info: Obteniendo todos los productos
+[2023-06-05 14:59:37] info: Deserializing user with id:
+[2023-06-05 14:59:51] error: Error cambiando rol del usuario Cast to ObjectId failed for value ":64232570ada0ea7c9a363a9f" (type string) at path "_id" for model "users"
