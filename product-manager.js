@@ -96,6 +96,9 @@ app.use(passport.session());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Configuración de Swagger
+require("./swagger")(app);
+
 // Ruta para la vista de productos en tiempo real
 app.get("/real-time-products", (req, res) => {
   res.render("realTimeProducts");

@@ -62,3 +62,21 @@
 [2023-06-05 14:59:36] info: Obteniendo todos los productos
 [2023-06-05 14:59:37] info: Deserializing user with id:
 [2023-06-05 14:59:51] error: Error cambiando rol del usuario Cast to ObjectId failed for value ":64232570ada0ea7c9a363a9f" (type string) at path "_id" for model "users"
+[2023-06-12 16:26:44] info: Deserializing user with id:
+[2023-06-12 16:26:44] info: Obteniendo todos los productos
+[2023-06-12 16:26:44] info: Deserializing user with id:
+[2023-06-12 16:26:46] info: Deserializing user with id:
+[2023-06-12 16:26:46] info: hola
+[2023-06-12 16:26:46] info: Deserializing user with id:
+[2023-06-12 16:26:50] info: Deserializing user with id:
+[2023-06-12 16:27:05] info: Deserializing user with id:
+[2023-06-12 16:27:05] info: Deserializing user with id:
+[2023-06-12 16:27:06] info: Deserializing user with id:
+[2023-06-12 16:27:06] info: Deserializing user with id:
+[2023-06-12 16:27:06] info: Deserializing user with id:
+[2023-06-12 16:27:06] info: Deserializing user with id:
+[2023-06-12 16:27:07] info: Deserializing user with id:
+[2023-06-12 16:27:07] info: Deserializing user with id:
+[2023-06-12 16:27:07] info: Deserializing user with id:
+[2023-06-12 16:27:26] info: Deserializing user with id:
+[2023-06-12 16:27:32] info: Deserializing user with id:
