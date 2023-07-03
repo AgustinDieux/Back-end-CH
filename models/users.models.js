@@ -34,8 +34,19 @@ const schema = new mongoose.Schema({
     default: "usuario",
     required: true,
   },
+  documents: [
+    {
+      name: {
+        type: String,
+      },
+      reference: {
+        type: String,
+      },
+    },
+  ],
+  last_connection: {
+    type: Date,
+  },
 });
 
-const userModel = mongoose.model(collection, schema);
-
-module.exports = userModel;
+module.exports = mongoose.model(collection, schema);

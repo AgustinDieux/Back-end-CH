@@ -80,3 +80,24 @@
 [2023-06-12 16:27:07] info: Deserializing user with id:
 [2023-06-12 16:27:26] info: Deserializing user with id:
 [2023-06-12 16:27:32] info: Deserializing user with id:
+[2023-07-03 11:18:46] info: Deserializing user with id:
+[2023-07-03 11:18:46] info: Obteniendo todos los productos
+[2023-07-03 11:18:47] info: Deserializing user with id:
+[2023-07-03 11:19:46] info: Deserializing user with id:
+[2023-07-03 11:20:07] info: Recibiendo solicitud de registro:
+[2023-07-03 11:20:07] info: Contraseña encriptada:
+[2023-07-03 11:20:07] info: Usuario creado:
+[2023-07-03 11:20:11] info: Deserializing user with id:
+[2023-07-03 11:20:12] info: Obteniendo todos los productos
+[2023-07-03 11:20:12] info: Deserializing user with id:
+[2023-07-03 14:18:33] error: Error cargando documentos users validation failed: age: Path `age` is required.
+[2023-07-03 14:21:56] error: Error cargando documentos users validation failed: age: Path `age` is required.
+[2023-07-03 14:23:38] error: Error cargando documentos users validation failed: age: Path `age` is required.
+[2023-07-03 14:32:45] error: Error cargando documentos Unexpected end of form
+[2023-07-03 14:34:04] error: Error cargando documentos Unexpected end of form
+[2023-07-03 14:42:34] error: Error cargando documentos Unexpected end of form
+[2023-07-03 14:43:09] error: Error cargando documentos Unexpected end of form
+[2023-07-03 14:49:26] error: Error cargando documentos Unexpected end of form
+[2023-07-03 14:51:26] error: Error cargando documentos Unexpected end of form
+[2023-07-03 14:56:27] error: Error cargando documentos Unexpected end of form
+[2023-07-03 14:58:36] error: Error cargando documentos Unexpected end of form
