@@ -34,7 +34,7 @@ router.get("/productsdos", productController.getAllProducts);
  *       404:
  *         description: No se encontró el producto con el ID especificado.
  */
-router.get("/:id", productController.getProductById);
+router.get("/products/:id", productController.getProductById);
 
 /**
  * @swagger
@@ -74,12 +74,18 @@ router.post(
 
 /**
  * @swagger
- * /{id}:
+ * /{userId}/productsdos/{productId}:
  *   delete:
  *     summary: Eliminar un producto por ID
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: userId
+ *         required: true
+ *         description: ID del usuario premium.
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: productId
  *         required: true
  *         description: ID del producto a eliminar.
  *         schema:
@@ -90,6 +96,10 @@ router.post(
  *       404:
  *         description: No se encontró el producto con el ID especificado.
  */
-router.delete("/:id", authorizationMiddleware, productController.deleteProduct);
+router.delete(
+  "/productsdos/:id",
+  authorizationMiddleware,
+  productController.deleteProduct
+);
 
 module.exports = router;

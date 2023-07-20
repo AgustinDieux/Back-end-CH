@@ -82,6 +82,17 @@ app.engine(
 );
 app.set("view engine", "handlebars");
 
+const Handlebars = exphbs.create({
+  // Agregar opción para deshabilitar la verificación de propiedades propias
+  runtimeOptions: {
+    allowProtoPropertiesByDefault: true,
+    allowProtoMethodsByDefault: true,
+  },
+});
+
+app.engine("handlebars", Handlebars.engine);
+app.set("view engine", "handlebars");
+
 app.use(
   session({
     secret: "cadenaDeTextoSecreta",
@@ -174,32 +185,6 @@ productRouter.get("/products", async (req, res) => {
     );
     res.status(500).json({
       error: "No se pudieron obtener los productos con Mongoose",
-      message: error,
-    });
-  }
-});
-
-productRouter.get("/products/:id", async (req, res) => {
-  try {
-    const productId = req.params.id;
-    const producto = await productoModel.findById(productId);
-
-    if (!producto) {
-      return res.status(404).json({ error: "Producto no encontrado" });
-    }
-
-    const product = {
-      nombre: producto.nombre,
-      descripcion: producto.descripcion,
-      precio: producto.precio,
-      id: producto._id,
-    };
-
-    res.render("layouts/product", { product });
-  } catch (error) {
-    console.error("No se pudo obtener el producto con Mongoose: " + error);
-    res.status(500).json({
-      error: "No se pudo obtener el producto con Mongoose",
       message: error,
     });
   }

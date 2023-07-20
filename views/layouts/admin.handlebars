@@ -1,0 +1,31 @@
+<h1>Administración de usuarios</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each users}}
+        <tr>
+            <td>{{this.name}}</td>
+            <td>{{this.email}}</td>
+            <td>{{this.role}}</td>
+            <td>
+                <form action="/api/users/premium/{{this._id}}" method="POST">
+                    <select name="role">
+                        <option value="user">Usuario</option>
+                        <option value="premium">Premium</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                    <button type="submit">Cambiar rol</button>
+                </form>
+            </td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>

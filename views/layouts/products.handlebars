@@ -1,41 +1,98 @@
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Productos</title>
-  </head>
-  <body>
-    <h1>Listado de productos</h1>
 
-    <form action="/logout" method="POST">
-      <button type="submit">Logout</button>
-    </form>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Productos</title>
+</head>
 
-    <p>Productos en el carrito: {{cart.products.length}}</p>
-    <a href="/api/cart/{{cart._id}}">Ir al carrito</a>
+<body>
+  <h1>Listado de productos</h1>
 
-    {{#each products}}
-      <div>
-        <h2>Nombre: {{this.nombre}}</h2>
-        <p>Descripcion: {{this.descripcion}}</p>
-        <p>Precio: ${{this.precio}}</p>
-        <p>Stock: {{this.cantidad}}</p>
-        <a href="/products/{{this.id}}">Ver detalles</a>
-        <button class="add-to-cart" data-id="{{this.id}}">Agregar al carrito</button>
-      </div>
-    {{/each}}
+  <form action="/logout" method="POST">
+    <button type="submit">Logout</button>
+  </form>
 
-    <script>
-      console.log("Código JavaScript cargado"); const addToCartButtons =
-      document.querySelectorAll(".add-to-cart");
-      addToCartButtons.forEach((button) => { button.addEventListener("click",
-      async (event) => { const productId = event.target.dataset.id;
-      console.log(`ID del producto: ${productId}`); const response = await
-      fetch(`/api/cart/{{cart._id}}`, { method: "POST", headers: {
-      "Content-Type": "application/json", }, body: JSON.stringify({ productId
-      }), }); console.log(`Respuesta de la solicitud POST: ${response.status}`);
-      if (response.ok) { console.log("Producto agregado al carrito"); } else {
-      console.error("Error agregando producto al carrito"); } }); });
-    </script>
-  </body>
+  <p>Productos en el carrito: {{cart.products.length}}</p>
+  <a href="/api/cart/{{cart._id}}">Ir al carrito</a>
+
+  {{#each products}}
+  <div>
+    <h2>Nombre: {{this.nombre}}</h2>
+    <p>Descripcion: {{this.descripcion}}</p>
+    <p>Precio: ${{this.precio}}</p>
+    <p>Stock: {{this.cantidad}}</p>
+    <a href="/api/products/{{this.id}}">Ver detalles</a>
+    <button class="add-to-cart" data-id="{{this.id}}">Agregar al carrito</button>
+
+    {{#if ../showDeleteButton}}
+
+    <input type="hidden" name="_method" value="DELETE">
+    <button type="submit" class="delete-product" data-id="{{this._id}}">Eliminar producto</button>
+
+    {{/if}}
+
+  </div>
+  {{/each}}
+
+  <script>
+    console.log("Código JavaScript cargado");
+    const addToCartButtons = document.querySelectorAll(".add-to-cart");
+    const deleteProductButtons = document.querySelectorAll(".delete-product");
+
+    addToCartButtons.forEach((button) => {
+      button.addEventListener("click", async (event) => {
+        const productId = event.target.dataset.id;
+        console.log(`ID del producto: ${productId}`);
+        const response = await fetch(`/api/cart/{{cart._id}}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            productId,
+          }),
+        });
+        console.log(`Respuesta de la solicitud POST: ${response.status}`);
+        if (response.ok) {
+          console.log("Producto agregado al carrito");
+        } else {
+          console.error("Error agregando producto al carrito");
+        }
+      });
+    });
+
+
+    deleteProductButtons.forEach((button) => {
+      button.addEventListener("click", async (event) => {
+        const productId = event.target.dataset.id;
+        console.log(`ID del producto a eliminar (desde products.handlebars): ${productId}`);
+
+        try {
+          const response = await fetch(`/api/productsdos/${productId}`, {
+            method: "DELETE", // Especificar el método DELETE aquí
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          console.log("Respuesta de la solicitud DELETE:", response);
+
+          if (response.ok) {
+            // Si la respuesta es exitosa, recargar la página para ver los cambios actualizados
+            window.location.reload();
+          } else {
+            console.error("Error eliminando producto");
+            // Puedes mostrar un mensaje de error en la página si lo deseas
+          }
+        } catch (error) {
+          console.error("Error eliminando producto", error);
+          // Puedes mostrar un mensaje de error en la página si lo deseas
+        }
+      });
+    });
+
+  </script>
+</body>
+
 </html>

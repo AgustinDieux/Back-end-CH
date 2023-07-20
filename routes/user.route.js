@@ -33,11 +33,14 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-router.patch("/premium/:uid", userController.changeUserRole);
+router.get("/users", userController.getAllUsers);
+router.post("/premium/:uid", userController.changeUserRole);
 router.post(
   "/:uid/documents",
   upload.array("documentFiles"),
   userController.uploadDocuments
 );
+router.delete("/", userController.deleteInactiveUsers);
+router.get("/admin/users", userController.adminGetAllUsers);
 
 module.exports = router;
