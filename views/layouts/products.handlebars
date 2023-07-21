@@ -13,7 +13,7 @@
     <button type="submit">Logout</button>
   </form>
 
-  <p>Productos en el carrito: {{cart.products.length}}</p>
+  <p>Productos en el carrito: <span id="cart-count">{{cart.products.length}}</span></p>
   <a href="/api/cart/{{cart._id}}">Ir al carrito</a>
 
   {{#each products}}
@@ -26,12 +26,11 @@
     <button class="add-to-cart" data-id="{{this.id}}">Agregar al carrito</button>
 
     {{#if ../showDeleteButton}}
-
-    <input type="hidden" name="_method" value="DELETE">
-    <button type="submit" class="delete-product" data-id="{{this._id}}">Eliminar producto</button>
-
+    <input type="hidden" name="_method" value="DELETE" />
+    <button type="submit" class="delete-product" data-id="{{this._id}}">
+      Eliminar producto
+    </button>
     {{/if}}
-
   </div>
   {{/each}}
 
@@ -56,17 +55,23 @@
         console.log(`Respuesta de la solicitud POST: ${response.status}`);
         if (response.ok) {
           console.log("Producto agregado al carrito");
+          // Obtener el elemento que muestra el número de productos en el carrito
+          const cartCountElement = document.querySelector("#cart-count");
+          // Incrementar el número de productos en el carrito en 1
+          cartCountElement.textContent =
+            parseInt(cartCountElement.textContent) + 1;
         } else {
           console.error("Error agregando producto al carrito");
         }
       });
     });
 
-
     deleteProductButtons.forEach((button) => {
       button.addEventListener("click", async (event) => {
         const productId = event.target.dataset.id;
-        console.log(`ID del producto a eliminar (desde products.handlebars): ${productId}`);
+        console.log(
+          `ID del producto a eliminar (desde products.handlebars): ${productId}`
+        );
 
         try {
           const response = await fetch(`/api/productsdos/${productId}`, {
@@ -91,7 +96,6 @@
         }
       });
     });
-
   </script>
 </body>
 
